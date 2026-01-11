@@ -15,9 +15,46 @@ class BromeoAssist(commands.Bot):
         super().__init__(command_prefix="!", intents=INTENTS)
 
     async def setup_hook(self):
-        for cog in ("ai_gemini", "images_openai", "tts_elevenlabs", "fortnite_api", "music", "rebuild", "ambient_ai","ai_gemini", "ambient_ai", "voice_lounge", "tts_autoplay", "twitch_chat",):
+
+    import os, traceback
+
+    # Optional cogs that require API keys; if key missing we skip instead of crashing.
+    OPTIONAL_BY_KEY = {
+        "ai_gemini": "GEMINI_API_KEY",
+        "images_openai": "OPENAI_API_KEY",
+        "ai_openai": "OPENAI_API_KEY",
+        "tts_elevenlabs": "ELEVENLABS_API_KEY",
+        "twitch_live": "TWITCH_CLIENT_ID",  # if you have this cog
+    }
+
+    # Determine which cogs to load.
+    # Prefer an existing list variable if present; otherwise load all modules in ./cogs
+    cogs_to_load = None
+    try:
+        cogs_to_load = None
+    except Exception:
+        cogs_to_load = None
+
+    if not cogs_to_load:
+        try:
+            import pkgutil
+            cogs_to_load = [m.name for m in pkgutil.iter_modules(["cogs"]) if not m.name.startswith("_")]
+        except Exception:
+            cogs_to_load = []
+
+    for cog in cogs_to_load:
+        key = OPTIONAL_BY_KEY.get(cog)
+        if key and not os.getenv(key):
+            print(f"[SKIP] cogs.{cog} (missing {key})")
+            continue
+
+        try:
             await self.load_extension(f"cogs.{cog}")
-        await self.tree.sync()
+            print(f"[OK] Loaded cogs.{cog}")
+        except Exception as e:
+            print(f"[FAIL] cogs.{cog}: {e}")
+            traceback.print_exc()
+            # Don't crash the whole bot because 1 cog failed.
 
 bot = BromeoAssist()
 
