@@ -1,0 +1,92 @@
+{
+  "server_name": "Bromeo's LOUNGE",
+  "brand": {
+    "streamer_name": "Bromeo",
+    "social_handle": "BromeoLIVE",
+    "assistant_name": "BromeoASSIST"
+  },
+  "roles": [
+    {
+      "name": "Owner",
+      "color": "#ffcc00",
+      "hoist": true
+    },
+    {
+      "name": "Mods",
+      "color": "#00ccff",
+      "hoist": true
+    },
+    {
+      "name": "VIP",
+      "color": "#cc00ff",
+      "hoist": true
+    },
+    {
+      "name": "Members",
+      "color": "#2ecc71",
+      "hoist": false
+    }
+  ],
+  "categories": [
+    {
+      "name": "📣 INFO",
+      "channels": [
+        {
+          "type": "text",
+          "name": "📌-welkom"
+        },
+        {
+          "type": "text",
+          "name": "📜-regels"
+        },
+        {
+          "type": "text",
+          "name": "📣-aankondigingen"
+        }
+      ]
+    },
+    {
+      "name": "💬 COMMUNITY",
+      "channels": [
+        {
+          "type": "text",
+          "name": "💬-chat"
+        },
+        {
+          "type": "text",
+          "name": "🤣-memes"
+        },
+        {
+          "type": "voice",
+          "name": "🎙️-lounge"
+        }
+      ]
+    },
+    {
+      "name": "🎮 GAMING",
+      "channels": [
+        {
+          "type": "text",
+          "name": "🎮-fortnite"
+        },
+        {
+          "type": "voice",
+          "name": "🎧-squad"
+        }
+      ]
+    },
+    {
+      "name": "🤖 BROMEOASSIST",
+      "channels": [
+        {
+          "type": "text",
+          "name": "🤖-ai-chat"
+        },
+        {
+          "type": "text",
+          "name": "🖼️-ai-images"
+        }
+      ]
+    }
+  ]
+}
