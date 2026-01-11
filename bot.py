@@ -14,9 +14,36 @@ class BromeoAssist(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=INTENTS)
 
-    async def setup_hook(self):
+    
+async def setup_hook(self):
+    import os, traceback, pkgutil
 
-    import os, traceback
+    OPTIONAL_BY_KEY = {
+        "ai_gemini": "GEMINI_API_KEY",
+        "images_openai": "OPENAI_API_KEY",
+        "ai_openai": "OPENAI_API_KEY",
+        "tts_elevenlabs": "ELEVENLABS_API_KEY",
+        "twitch_live": "TWITCH_CLIENT_ID",
+    }
+
+    # auto-discover cogs
+    try:
+        cogs_to_load = [m.name for m in pkgutil.iter_modules(["cogs"]) if not m.name.startswith("_")]
+    except Exception:
+        cogs_to_load = []
+
+    for cog in cogs_to_load:
+        key = OPTIONAL_BY_KEY.get(cog)
+        if key and not os.getenv(key):
+            print(f"[SKIP] cogs.{cog} (missing {key})")
+            continue
+
+        try:
+            await self.load_extension(f"cogs.{cog}")
+            print(f"[OK] Loaded cogs.{cog}")
+        except Exception as e:
+            print(f"[FAIL] cogs.{cog}: {e}")
+            traceback.print_exc()
 
     # Optional cogs that require API keys; if key missing we skip instead of crashing.
     OPTIONAL_BY_KEY = {
