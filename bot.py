@@ -15,8 +15,64 @@ class BromeoAssist(commands.Bot):
         super().__init__(command_prefix="!", intents=INTENTS)
 
     
+
 async def setup_hook(self):
-    import os, traceback, pkgutil
+    import os, traceback
+
+    # Explicit cog load order (stable & predictable)
+    COGS_TO_LOAD = [
+        "ai_gemini",
+        "images_openai",
+        "tts_elevenlabs",
+        "tts_autoplay",
+        "voice_lounge",
+        "twitch_chat",
+        "ambient_ai",
+        "fortnite_api",
+        "rebuild",
+    ]
+
+    OPTIONAL_BY_KEY = {
+        "ai_gemini": "GEMINI_API_KEY",
+        "images_openai": "OPENAI_API_KEY",
+        "tts_elevenlabs": "ELEVENLABS_API_KEY",
+        # twitch_chat may need its own credentials depending on implementation
+    }
+
+    for cog in COGS_TO_LOAD:
+        key = OPTIONAL_BY_KEY.get(cog)
+        if key and not os.getenv(key):
+            print(f"[SKIP] cogs.{cog} (missing {key})")
+            continue
+
+        try:
+            await self.load_extension(f"cogs.{cog}")
+            print(f"[OK] Loaded cogs.{cog}")
+        except Exception as e:
+            print(f"[FAIL] cogs.{cog}: {e}")
+            traceback.print_exc()
+
+    # Diagnostics: list commands present in the local tree
+    try:
+        cmds = [c.qualified_name for c in self.tree.get_commands()]
+        print(f"[TREE] Local commands ({len(cmds)}): {cmds}")
+    except Exception as e:
+        print(f"[TREE] Could not list commands: {e}")
+
+    # Sync commands so Discord matches what this bot actually has.
+    # If GUILD_ID is set, sync to that guild for instant updates.
+    try:
+        gid = os.getenv("GUILD_ID")
+        if gid:
+            import discord
+            guild = discord.Object(id=int(gid))
+            await self.tree.sync(guild=guild)
+            print(f"[SYNC] Synced commands to guild {gid}")
+        else:
+            await self.tree.sync()
+            print("[SYNC] Synced commands globally")
+    except Exception as e:
+        print(f"[SYNC] Failed to sync: {e}")
 
     OPTIONAL_BY_KEY = {
         "ai_gemini": "GEMINI_API_KEY",
